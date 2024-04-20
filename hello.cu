@@ -1,5 +1,5 @@
 #include <cuda_runtime.h>
-#include<stdio.h>
+#include <stdio.h>
 #include "timer.h"
 
 __global__ void vectorAdd(float *a,float *b, float *c, int N){
