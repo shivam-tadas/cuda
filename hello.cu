@@ -2,7 +2,7 @@
 #include<stdio.h>
 #include "timer.h"
 
-__global__ void vectorAdd(float *a,float *b, float *c, int N){
+__global__ void vector_add(float *a,float *b, float *c, int N){
     int i = blockIdx.x * blockDim.x + threadIdx.x;
     if(i < N){
         c[i] = a[i] + b[i];
@@ -14,7 +14,7 @@ int main(){
 
     cudaDeviceSynchronize();
 
-    const int N = 10000000;
+    const int N = 10;
 
 
     float *a = new float[N];
@@ -36,6 +36,11 @@ int main(){
     }
     printf("Cpu time taken :- %f ns\n",cpu_t.nanoseconds());
 
+    printf("array from the cpu \n");
+    for (int i = 0; i < N; i++){
+        printf("%d ",out[i]);
+    }
+
     float *d_a, *d_b, *d_out;
     cudaMalloc(&d_a, Size);
     cudaMalloc(&d_b, Size);
@@ -51,11 +56,16 @@ int main(){
     core::timer gpu_t;
     gpu_t.start();
 
-    vectorAdd<<<blocksPerGrid,threadsPerBlock>>>(d_a,d_b,d_out,N);
+    vector_add<<<blocksPerGrid,threadsPerBlock>>>(d_a,d_b,d_out,N);
 
     printf("gpu time taken :- %f ns\n",gpu_t.nanoseconds());
 
-    cudaMemcpy(d_out,out_p,Size,cudaMemcpyDeviceToHost);
+    cudaMemcpy(out_p,d_out,Size,cudaMemcpyDeviceToHost);
+
+    // printf("array from the gpu \n");
+    // for (int i = 0; i < N; i++){
+    //     printf("%d ",out_p[i]);
+    // }
 
     cudaFree(d_a);
     cudaFree(d_b);
