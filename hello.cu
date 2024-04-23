@@ -14,7 +14,7 @@ int main(){
 
     cudaDeviceSynchronize();
 
-    const int N = 10;
+    const int N = 1000000;
 
 
     float *a = new float[N];
@@ -36,10 +36,13 @@ int main(){
     }
     printf("Cpu time taken :- %f ns\n",cpu_t.nanoseconds());
 
-    printf("array from the cpu \n");
-    for (int i = 0; i < N; i++){
-        printf("%d ",out[i]);
-    }
+    // printf("array from the cpu \n");
+    // for (int i = 0; i < N; i++){
+    //     printf("%d ",out[i]);
+    // }
+
+    core::timer gpu_total_t;
+    gpu_total_t.start();
 
     float *d_a, *d_b, *d_out;
     cudaMalloc(&d_a, Size);
@@ -70,6 +73,8 @@ int main(){
     cudaFree(d_a);
     cudaFree(d_b);
     cudaFree(d_out);
+
+    printf("gpu time taken :- %f ns\n",gpu_total_t.nanoseconds());
 
     return 0;
 }

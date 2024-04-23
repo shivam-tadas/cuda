@@ -6,7 +6,7 @@ __global__ void matrix_add(float *a,float *b, float *c, int N,int M){
     int i = blockIdx.x * blockDim.x + threadIdx.x;
     int j = blockIdx.y * blockDim.y + threadIdx.y;
     if(i < N && i < M){
-        c[ i * M + j ] = a[i * M + j] + b[i * M + j];
+        c[ i * N + j ] = a[i * N + j] + b[i * N + j];
     }
 }
 
@@ -47,6 +47,9 @@ int main(){
     //     printf("\n");
     // }
 
+    core::timer gpu_total_t;
+    gpu_total_t.start();
+
     float *d_a, *d_b, *d_out;
     cudaMalloc(&d_a, Size);
     cudaMalloc(&d_b, Size);
@@ -68,7 +71,7 @@ int main(){
 
     cudaMemcpy(out_p,d_out,Size,cudaMemcpyDeviceToHost);
 
-    // printf("added matrix from cpu\n");
+    // printf("added matrix from gpu\n");
     // for (int i = 0; i < N; i++){
     //     for(int j = 0; j < M;j++){
     //         printf("%f ",out_p[i][j]);
@@ -80,5 +83,7 @@ int main(){
     cudaFree(d_b);
     cudaFree(d_out);
 
+    printf("gpu total time taken :- %f ns\n",gpu_total_t.nanoseconds());
+    
     return 0;
 }
