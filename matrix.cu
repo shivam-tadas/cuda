@@ -15,16 +15,20 @@ int main(){
 
     cudaDeviceSynchronize();
 
-    const int N = 700;
-    const int M = 700;
+    const int N = 10000;
+    const int M = 10000;
 
 
-    float a[N][M],b[N][M],out[N][M],out_p[N][M];
+    //float a[N][M], b[N][M], out[N][M], out_p[N][M];
+    float *a = (float*)malloc(N * M * sizeof(float));
+    float *b = (float*)malloc(N * M * sizeof(float));
+    float *out = (float*)malloc(N * M * sizeof(float));
+    float *out_p = (float*)malloc(N * M * sizeof(float));
 
     for (int i = 0; i < N; i++){
-        for(int j = 0; j < M;j++){
-            a[i][j] = rand();
-            b[i][j] = rand();
+        for (int j = 0; j < M; j++){
+            a[i * N + j] = rand() / (float)RAND_MAX;
+            b[i * N + j] = rand() / (float)RAND_MAX;
         }
     }
 
@@ -34,15 +38,15 @@ int main(){
     cpu_t.start();
     for (int i = 0; i < N; i++){
         for(int j = 0; j < M;j++){
-            out[i][j] = a[i][j] + b[i][j];
+            out[i * N + j] = a[i * N + j] + b[i * N + j];
         }
     }
-    printf("Cpu time taken :- %f ns\n",cpu_t.nanoseconds());
+    printf("Cpu time taken :- %f sec\n", cpu_t.nanoseconds()/1000000000);
 
     // printf("added matrix from cpu\n");
     // for (int i = 0; i < N; i++){
     //     for(int j = 0; j < M;j++){
-    //         printf("%f ",out[i][j]);
+    //         printf("%f ",out[i * N + j]);
     //     }
     //     printf("\n");
     // }
@@ -67,14 +71,14 @@ int main(){
 
     matrix_add<<<blocksPerGrid,threadsPerBlock>>>(d_a,d_b,d_out,N,M);
 
-    printf("gpu time taken :- %f ns\n",gpu_t.nanoseconds());
+   printf("gpu time taken :- %f sec\n", gpu_t.nanoseconds()/1000000000);
 
     cudaMemcpy(out_p,d_out,Size,cudaMemcpyDeviceToHost);
 
     // printf("added matrix from gpu\n");
     // for (int i = 0; i < N; i++){
     //     for(int j = 0; j < M;j++){
-    //         printf("%f ",out_p[i][j]);
+    //         printf("%f ",out_p[i * N + j]);
     //     }
     //     printf("\n");
     // }
@@ -83,7 +87,7 @@ int main(){
     cudaFree(d_b);
     cudaFree(d_out);
 
-    printf("gpu total time taken :- %f ns\n",gpu_total_t.nanoseconds());
+    printf("gpu total time taken :- %f sec\n",gpu_total_t.nanoseconds()/1000000000);
     
     return 0;
 }

@@ -21,15 +21,19 @@ int main()
 
     cudaDeviceSynchronize();
 
-    const int N = 700;
-    const int M = 700;
+    const int N = 2000;
+    const int M = 2000;
 
-    float a[N][M], b[N][M], out[N][M], out_p[N][M];
+    //float a[N][M], b[N][M], out[N][M], out_p[N][M];
+    float *a = (float*)malloc(N * M * sizeof(float));
+    float *b = (float*)malloc(N * M * sizeof(float));
+    float *out = (float*)malloc(N * M * sizeof(float));
+    float *out_p = (float*)malloc(N * M * sizeof(float));
 
     for (int i = 0; i < N; i++){
         for (int j = 0; j < M; j++){
-            a[i][j] = rand() / (float)RAND_MAX;
-            b[i][j] = rand() / (float)RAND_MAX;
+            a[i * N + j] = rand() / (float)RAND_MAX;
+            b[i * N + j] = rand() / (float)RAND_MAX;
         }
     }
 
@@ -41,9 +45,9 @@ int main()
         for (int j = 0; j < M; j++){
             float sum = 0.0f;
             for (int k = 0; k < N; k++){
-                sum += a[i][k] * b[k][j]; 
+                sum += a[i * N + k] * b[k * N + j ]; 
             }
-            out[i][j] = sum;
+            out[i * N + j] = sum;
         }
     }
 
@@ -52,7 +56,7 @@ int main()
     // printf("added matrix from cpu\n");
     // for (int i = 0; i < N; i++){
     //     for (int j = 0; j < M; j++){
-    //         printf("%f ", out[i][j]);
+    //         printf("%f ",  out[i * N + j]);
     //     }
     //     printf("\n");
     // }
@@ -84,7 +88,7 @@ int main()
     // printf("added matrix from cpu\n");
     // for (int i = 0; i < N; i++){
     //     for (int j = 0; j < M; j++){
-    //         printf("%f ", out_p[i][j]);
+    //         printf("%f ", out_p[i * N + j]);
     //     }
     //     printf("\n");
     // }
